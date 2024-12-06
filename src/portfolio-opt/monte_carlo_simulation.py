@@ -1,5 +1,6 @@
 import numpy as np
-from Portfolio import Portfolio 
+from portfolio import Portfolio
+
 
 class MonteCarloSimulation:
     def __init__(self, simulations, tickers):
@@ -30,7 +31,7 @@ class MonteCarloSimulation:
 
     def _generate_portfolios(self):
         for simulation_no in range(self.simulations):
-            print(f"Simulation: {simulation_no} ")
+            print(f"Simulation: {simulation_no}")
             print("Generating Portfolio")
             weights = self._randomise_weights()
             portfolio = Portfolio(weights, len(self.tickers))
@@ -40,7 +41,7 @@ class MonteCarloSimulation:
         weights = np.array(np.random.random(len(self.tickers)))
         weights = weights / np.sum(weights)
         return weights
-    
+
     def get_portfolios(self):
         return self.portfolios
 
