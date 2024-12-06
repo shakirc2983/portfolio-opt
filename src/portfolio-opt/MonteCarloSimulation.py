@@ -1,22 +1,48 @@
+import numpy as np
+from Portfolio import Portfolio 
+
 class MonteCarloSimulation:
     def __init__(self, simulations, tickers):
         self.simulations = simulations
         self.tickers = tickers
-        self.portfolio_size = len(tickers)
+        self.portfolios = []
         self.id = id(self)
+
+        self._initialize_object()
 
     def __str__(self):
         return f"""
         Monte Carlo Simulation: {self.id}
         Simulations: {self.simulations}
         Stocks: {self.tickers}
-        Portfolio Size: {self.portfolio_size}
+        Portfolio Size: {len(self.tickers)}
         """
 
-    def _randomise_weights(self):
-        pass
+    def __repr__(self):
+        return f"MonteCarloSimulation(simulations={self.simulations}, tickers={self.tickers})"
 
-    # Randomise weights for self.portfolio_size
+    def __len__(self):
+        return self.simulations
+
+    def _initialize_object(self):
+
+        self._generate_portfolios()
+
+    def _generate_portfolios(self):
+        for simulation_no in range(self.simulations):
+            print(f"Simulation: {simulation_no} ")
+            print("Generating Portfolio")
+            weights = self._randomise_weights()
+            portfolio = Portfolio(weights, len(self.tickers))
+            self.portfolios.append(portfolio)
+
+    def _randomise_weights(self):
+        weights = np.array(np.random.random(len(self.tickers)))
+        weights = weights / np.sum(weights)
+        return weights
+    
+    def get_portfolios(self):
+        return self.portfolios
 
     def set_returns(self):
         pass
