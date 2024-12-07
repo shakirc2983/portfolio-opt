@@ -2,6 +2,8 @@ from monte_carlo_simulation import MonteCarloSimulation
 
 
 if __name__ == "__main__":
-    mcs = MonteCarloSimulation(10, ["APPL", "GOOGL"])
+    mcs = MonteCarloSimulation(10000, ["AAPL", "MSFT", "SQ", "AMZN"])
     print(mcs)
-    print(mcs.portfolios[0])
+    portfolios = mcs.get_portfolios()
+
+    print(mcs.overview())
