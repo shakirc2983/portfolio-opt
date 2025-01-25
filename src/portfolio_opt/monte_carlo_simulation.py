@@ -1,9 +1,9 @@
 import yfinance as yf
 import numpy as np
 import pandas as pd
+from yfinance import shared
 from portfolio_opt.portfolio import Portfolio
-import yfinance.shared as shared
-
+from portfolio_opt.exceptions import TickerDownloadError
 
 class MonteCarloSimulation:
     def __init__(self, simulations, tickers):
@@ -47,9 +47,10 @@ class MonteCarloSimulation:
             if "Close" not in data.columns:
                 raise KeyError("'Close' column not found in the returned data.")
 
+            # pylint: disable-next=global-statement
             if shared._ERRORS:
-                tickers_error = list(shared._ERRORS.keys())
-                raise Exception(f"Can't download specific tickers {tickers_error}")
+                tickers_error = list(shared._ERRORS.keys()) # pylint: disable=global-statement
+                raise TickerDownloadError(f"Can't download specific tickers {tickers_error}")
             return data["Close"]
 
         except Exception as e:
