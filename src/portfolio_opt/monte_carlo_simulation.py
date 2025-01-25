@@ -53,7 +53,7 @@ class MonteCarloSimulation:
                 raise TickerDownloadError(f"Can't download specific tickers {tickers_error}")
             return data["Close"]
 
-            # pylint: enabled:protected-access
+            # pylint: enable:protected-access
 
         except (ValueError, KeyError, TickerDownloadError) as e:
             print(f"[ERROR]: {e}")
