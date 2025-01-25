@@ -1,6 +1,8 @@
-import numpy as np
 import yfinance as yf
+import numpy as np
+import pandas as pd
 from portfolio_opt.portfolio import Portfolio
+import yfinance.shared as shared
 
 
 class MonteCarloSimulation:
@@ -9,7 +11,7 @@ class MonteCarloSimulation:
         self.simulations = simulations
         self.tickers = tickers
         self.portfolios = []
-
+        self.exit_flag = False
         self._initialize_object()
 
     def __str__(self):
@@ -28,18 +30,32 @@ class MonteCarloSimulation:
         return self.simulations
 
     def _initialize_object(self):
-
         self._generate_portfolios()
 
     def _get_historical_returns(self):
         start_date = "2024-09-07"
         end_date = "2024-10-07"
+        data = pd.DataFrame()
+        try:
+            data = yf.download(self.tickers, start=start_date, end=end_date)
 
-        data = yf.download(self.tickers, start=start_date, end=end_date)
+            if data is None or data.empty:
+                raise ValueError(
+                    "No data returned by yfinance. Please check the tickers or date range."
+                )
 
-        price_df = data["Close"]
+            if "Close" not in data.columns:
+                raise KeyError("'Close' column not found in the returned data.")
 
-        return price_df
+            if shared._ERRORS:
+                tickers_error = list(shared._ERRORS.keys())
+                raise Exception(f"Can't download specific tickers {tickers_error}")
+            return data["Close"]
+
+        except Exception as e:
+            print(f"[ERROR]: {e}")
+            self.exit_flag = True
+            return pd.DataFrame()
 
     def _calculate_expected_return(self, weights, log_return):
         exp_ret = np.sum((log_return.mean() * weights) * 252)
@@ -59,6 +75,10 @@ class MonteCarloSimulation:
 
     def _generate_portfolios(self):
         price_df = self._get_historical_returns()
+
+        if self.exit_flag:
+            return
+
         for simulation_no in range(1, self.simulations + 1):
             weights = self._randomise_weights()
             log_return = np.log(1 + price_df.pct_change())
@@ -115,6 +135,16 @@ class MonteCarloSimulation:
         return min(self.portfolios, key=lambda p: p.sharpe_ratio).sharpe_ratio
 
     def overview(self):
+        if self.exit_flag:
+            return f"""
+        --- Overview ---
+        Number of Portfolios: {self.simulations if hasattr(self, 'simulations') else 'NA'}
+        Volatility (Min): 0.0
+        Volatility (Max): 0.0
+        Sharpe Ratio (Max): 0.0
+        Sharpe Ratio (Min): 0.0
+        """
+
         return f"""
         --- Overview ---
         Number of Portfolios: {self.simulations}
