@@ -47,11 +47,13 @@ class MonteCarloSimulation:
             if "Close" not in data.columns:
                 raise KeyError("'Close' column not found in the returned data.")
 
-            # pylint: disable-next=global-statement
+            # pylint: disable:protected-access
             if shared._ERRORS:
-                tickers_error = list(shared._ERRORS.keys()) # pylint: disable=global-statement
+                tickers_error = list(shared._ERRORS.keys())
                 raise TickerDownloadError(f"Can't download specific tickers {tickers_error}")
             return data["Close"]
+
+            # pylint: enabled:protected-access
 
         except (ValueError, KeyError, TickerDownloadError) as e:
             print(f"[ERROR]: {e}")
