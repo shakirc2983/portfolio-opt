@@ -53,7 +53,7 @@ class MonteCarloSimulation:
                 raise TickerDownloadError(f"Can't download specific tickers {tickers_error}")
             return data["Close"]
 
-        except Exception as e:
+        except (ValueError, KeyError, TickerDownloadError) as e:
             print(f"[ERROR]: {e}")
             self.exit_flag = True
             return pd.DataFrame()
