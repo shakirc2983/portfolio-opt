@@ -1,15 +1,20 @@
+import datetime
 import yfinance as yf
 import numpy as np
 import pandas as pd
 from yfinance import shared
+from yfinance.exceptions import YFTickerMissingError
 from portfolio_opt.portfolio import Portfolio
 from portfolio_opt.exceptions import TickerDownloadError
 
+
 class MonteCarloSimulation:
-    def __init__(self, simulations, tickers):
+    def __init__(self, simulations, tickers, start_date, end_date):
         self.id = id(self)
         self.simulations = simulations
         self.tickers = tickers
+        self.start_date = start_date
+        self.end_date = end_date
         self.portfolios = []
         self.exit_flag = False
         self._initialize_object()
@@ -29,12 +34,40 @@ class MonteCarloSimulation:
     def __len__(self):
         return self.simulations
 
+    def _validate_date(self, date_text):
+        try:
+            datetime.date.fromisoformat(date_text)
+        except ValueError:
+            raise ValueError("Incorrect date format, should be YYYY-MM-DD")
+
+    def _validate_tickers(self, tickers):
+        for ticker_text in tickers:
+            info = None
+            ticker = yf.Ticker(ticker_text)
+            try:
+                info = ticker.info
+
+            except Exception as e:
+                self.exit_flag = True
+                # print(e)
+                raise YFTickerMissingError(
+                    ticker=ticker, rationale="Couldn't find ticker in yfinance"
+                )
+
+            ## TODO: Check if exception above is working.
+
     def _initialize_object(self):
+        self._validate_tickers(self.tickers)
+        self._validate_date(self.start_date)
+        self._validate_date(self.end_date)
+
+        if self.exit_flag:
+            return
         self._generate_portfolios()
 
     def _get_historical_returns(self):
-        start_date = "2024-09-07"
-        end_date = "2024-10-07"
+        start_date = self.start_date
+        end_date = self.end_date
         data = pd.DataFrame()
         try:
             data = yf.download(self.tickers, start=start_date, end=end_date)
@@ -50,7 +83,9 @@ class MonteCarloSimulation:
             # pylint: disable:protected-access
             if shared._ERRORS:
                 tickers_error = list(shared._ERRORS.keys())
-                raise TickerDownloadError(f"Can't download specific tickers {tickers_error}")
+                raise TickerDownloadError(
+                    f"Can't download specific tickers {tickers_error}"
+                )
             return data["Close"]
 
             # pylint: enable:protected-access
