@@ -14,7 +14,6 @@ class TestMCS(unittest.TestCase):
         
         self.assertEqual(str(context.exception), "Incorrect date format, should be YYYY-MM-DD")
     def test_validate_tickers(self):
-        ## TODO: Need to fix this.
         start_date = "2024-01-05"
         end_date = "2024-01-09"
 
@@ -23,7 +22,11 @@ class TestMCS(unittest.TestCase):
         with self.assertRaises(YFTickerMissingError) as context:
             mcs_object = MonteCarloSimulation(100,tickers,start_date,end_date)
 
-        self.assertEqual(str(context.exception), "Couldn't find ticker in yfinance")
+        expected_ticker = "foo"
+        expected_rationale = "Couldn't find ticker in yfinance"
+
+        self.assertEqual(context.exception.ticker, expected_ticker)
+        self.assertEqual(context.exception.rationale, expected_rationale)
     #def test_get_args(self):
     #   tickers = ['AAPL']
     #    mcs_object = MonteCarloSimulation(5000,tickers)

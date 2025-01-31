@@ -6,6 +6,7 @@ from yfinance import shared
 from yfinance.exceptions import YFTickerMissingError
 from portfolio_opt.portfolio import Portfolio
 from portfolio_opt.exceptions import TickerDownloadError
+import requests
 
 
 class MonteCarloSimulation:
@@ -42,19 +43,19 @@ class MonteCarloSimulation:
 
     def _validate_tickers(self, tickers):
         for ticker_text in tickers:
-            info = None
             ticker = yf.Ticker(ticker_text)
             try:
-                info = ticker.info
+                info = ticker.info["forwardPE"]
 
-            except Exception as e:
-                self.exit_flag = True
-                # print(e)
+            except requests.exceptions.HTTPError as e:
+                print(f"HTTP error: {e.args[0]}")
+            except KeyError as e:
+                print(f"Key error: {e}")
                 raise YFTickerMissingError(
-                    ticker=ticker, rationale="Couldn't find ticker in yfinance"
+                    ticker=ticker_text, rationale="Couldn't find ticker in yfinance"
                 )
-
-            ## TODO: Check if exception above is working.
+            finally:
+                self.exit_flag = True
 
     def _initialize_object(self):
         self._validate_tickers(self.tickers)
