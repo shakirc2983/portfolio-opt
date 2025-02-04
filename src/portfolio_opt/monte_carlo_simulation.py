@@ -1,11 +1,12 @@
 import datetime
+from pandas._libs.tslibs import Tick
 import yfinance as yf
 import numpy as np
 import pandas as pd
 from yfinance import shared
 from yfinance.exceptions import YFTickerMissingError
 from portfolio_opt.portfolio import Portfolio
-from portfolio_opt.exceptions import TickerDownloadError
+from portfolio_opt.exceptions import TickerDateOutOfRange, TickerDownloadError
 import requests
 
 
@@ -37,9 +38,20 @@ class MonteCarloSimulation:
 
     def _validate_date(self, date_text):
         try:
-            datetime.date.fromisoformat(date_text)
+            past = datetime.date.fromisoformat(date_text)
+            present = datetime.date.today()
+            if past >= present:
+                raise TickerDateOutOfRange(
+                    tickers_error=f"Past: {past} greater than Present: {present} for {self.tickers}"
+                )
+            if self.start_date >= self.end_date:
+                raise TickerDateOutOfRange(
+                    tickers_error=f"Portfolio start date {self.start_date} greater than portfolio end date {self.end_date}"
+                )
         except ValueError:
             raise ValueError("Incorrect date format, should be YYYY-MM-DD")
+        finally:
+            self.exit_flag = True
 
     def _validate_tickers(self, tickers):
         for ticker_text in tickers:
@@ -62,6 +74,8 @@ class MonteCarloSimulation:
         self._validate_date(self.start_date)
         self._validate_date(self.end_date)
 
+        if self.start_date >= self.end_date:
+            raise
         if self.exit_flag:
             return
         self._generate_portfolios()
