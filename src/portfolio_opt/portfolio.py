@@ -40,3 +40,9 @@ class Portfolio:
 
     def get_sharpe_ratio(self):
         return self.sharpe_ratio
+
+    def get_expected_returns(self):
+        return self.expected_returns
+
+    def get_expected_volatility(self):
+        return self.expected_volatility

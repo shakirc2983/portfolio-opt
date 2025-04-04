@@ -1,5 +1,4 @@
 import datetime
-from pandas._libs.tslibs import Tick
 import yfinance as yf
 import numpy as np
 import pandas as pd
@@ -8,6 +7,7 @@ from yfinance.exceptions import YFTickerMissingError
 from portfolio_opt.portfolio import Portfolio
 from portfolio_opt.exceptions import TickerDateOutOfRange, TickerDownloadError
 import requests
+import random
 
 
 class MonteCarloSimulation:
@@ -19,6 +19,7 @@ class MonteCarloSimulation:
         self.end_date = end_date
         self.portfolios = []
         self.exit_flag = False
+        self.annualized_day = 252
         self._initialize_object()
 
     def __str__(self):
@@ -41,41 +42,39 @@ class MonteCarloSimulation:
             past = datetime.date.fromisoformat(date_text)
             present = datetime.date.today()
             if past >= present:
+                self.exit_flag = True
                 raise TickerDateOutOfRange(
                     tickers_error=f"Past: {past} greater than Present: {present} for {self.tickers}"
                 )
             if self.start_date >= self.end_date:
+                self.exit_flag = True
                 raise TickerDateOutOfRange(
                     tickers_error=f"Portfolio start date {self.start_date} greater than portfolio end date {self.end_date}"
                 )
         except ValueError:
-            raise ValueError("Incorrect date format, should be YYYY-MM-DD")
-        finally:
             self.exit_flag = True
+            raise ValueError("Incorrect date format, should be YYYY-MM-DD")
 
     def _validate_tickers(self, tickers):
         for ticker_text in tickers:
             ticker = yf.Ticker(ticker_text)
             try:
                 info = ticker.info["forwardPE"]
-
             except requests.exceptions.HTTPError as e:
                 print(f"HTTP error: {e.args[0]}")
+                self.exit_flag = True
             except KeyError as e:
                 print(f"Key error: {e}")
+                self.exit_flag = True
                 raise YFTickerMissingError(
                     ticker=ticker_text, rationale="Couldn't find ticker in yfinance"
                 )
-            finally:
-                self.exit_flag = True
 
     def _initialize_object(self):
         self._validate_tickers(self.tickers)
         self._validate_date(self.start_date)
         self._validate_date(self.end_date)
 
-        if self.start_date >= self.end_date:
-            raise
         if self.exit_flag:
             return
         self._generate_portfolios()
@@ -156,6 +155,9 @@ class MonteCarloSimulation:
 
     def get_portfolios(self):
         return self.portfolios
+
+    def get_random_portfolio(self):
+        return random.choice(self.portfolios)
 
     def min_volatility(self):
         return min(self.portfolios, key=lambda p: p.expected_volatility)
