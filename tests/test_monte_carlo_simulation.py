@@ -1,10 +1,12 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
+import yfinance as yf
 from yfinance.exceptions import YFTickerMissingError
 from portfolio_opt.monte_carlo_simulation import MonteCarloSimulation
 from portfolio_opt.exceptions import TickerDateOutOfRange
 import numpy as np
+
 
 class TestMCS(unittest.TestCase):
 
@@ -27,7 +29,10 @@ class TestMCS(unittest.TestCase):
         with self.assertRaises(TickerDateOutOfRange) as context:
             mcs_object = MonteCarloSimulation(100, tickers, start_date, end_date)
 
-        self.assertEqual(str(context.exception), f"Date given not valid: Portfolio start date {start_date} greater than portfolio end date {end_date}")
+        self.assertEqual(
+            str(context.exception),
+            f"Date given not valid: Portfolio start date {start_date} greater than portfolio end date {end_date}",
+        )
 
     def test_validate_tickers(self):
         start_date = "2024-01-05"
@@ -46,5 +51,27 @@ class TestMCS(unittest.TestCase):
 
     # TODO: // Create test cases for trying to see if the results of get_expected_returns and get_volatility is the right one produced
     #       // Run functions and see if results produced is the same
+    def test_returns_and_volatility(self):
+
+        start_date = "2022-01-04"
+        end_date = "2022-01-08"
+
+        # Download the 
+        tickers = ["AAPL", "MSFT"]
+
+        data = yf.download(tickers=tickers, start=start_date, end=end_date)
+
+        test_expected_returns = 0.0
+        test_expected_volatility = 0.0
+
+        mcs_object = MonteCarloSimulation(100, tickers, start_date, end_date)
+        portfolio = mcs_object.get_random_portfolio()
+        print(portfolio)
 
 
+
+
+
+
+
+        
