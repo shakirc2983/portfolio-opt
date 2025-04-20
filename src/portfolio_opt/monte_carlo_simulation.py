@@ -183,7 +183,7 @@ class MonteCarloSimulation:
     def max_volatility(self):
         return max(
             self.portfolios, key=lambda p: p.expected_volatility
-        ).expected_volatility
+        )
 
     def max_sharpe(self):
         return max(self.portfolios, key=lambda p: p.sharpe_ratio)
@@ -235,4 +235,20 @@ class MonteCarloSimulation:
         figures, axis = plt.subplots()
         graph = axis.pie(sizes, labels=tickers, autopct="%1.1f%%")
         plt.show()
-        return graph
+        return graph 
+    def plot_mcs(self):
+        plt.figure(figsize=(12,8))
+        vol_arr, ret_arr, sharpe_arr = zip(*[(p.expected_volatility, p.expected_returns, p.sharpe_ratio)
+            for p in self.portfolios
+        ])
+        plt.scatter(vol_arr, ret_arr, c=sharpe_arr)
+        plt.colorbar(label='Sharpe Ratio')
+        plt.xlabel('Volatility')
+        plt.ylabel('Return')
+        
+        max_sharpe_port = self.max_sharpe()
+        plt.scatter(max_sharpe_port.expected_volatility, max_sharpe_port.expected_returns, c='red', s=50, edgecolors='black')
+
+        min_volatility_port = self.min_volatility()
+        plt.scatter(min_volatility_port.expected_volatility, min_volatility_port.expected_returns, c='lawngreen', s=50, edgecolors='black')
+        plt.show()
