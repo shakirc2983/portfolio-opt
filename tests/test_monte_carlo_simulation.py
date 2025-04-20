@@ -1,3 +1,4 @@
+from sys import exception
 import unittest
 from unittest.mock import patch
 import pandas as pd
@@ -49,29 +50,47 @@ class TestMCS(unittest.TestCase):
         self.assertEqual(context.exception.ticker, expected_ticker)
         self.assertEqual(context.exception.rationale, expected_rationale)
 
-    # TODO: // Create test cases for trying to see if the results of get_expected_returns and get_volatility is the right one produced
-    #       // Run functions and see if results produced is the same
     def test_returns_and_volatility(self):
 
         start_date = "2022-01-04"
         end_date = "2022-01-08"
 
-        # Download the 
         tickers = ["AAPL", "MSFT"]
-
         data = yf.download(tickers=tickers, start=start_date, end=end_date)
 
-        test_expected_returns = 0.0
-        test_expected_volatility = 0.0
+        if data is None or data.empty or "Close" not in data:
+            raise ValueError("Failed to fetch valid data from Yahoo Finance.")
 
+        close_data = data["Close"]
         mcs_object = MonteCarloSimulation(100, tickers, start_date, end_date)
         portfolio = mcs_object.get_random_portfolio()
-        print(portfolio)
 
-
-
-
-
-
-
+        log_return = np.log(close_data / close_data.shift(1)).dropna()
+        weights = np.array([0.5, 0.5])
         
+        # Manual Implementation
+        # mean_returns = log_return.mean()
+        # expected_return = np.dot(log_return.mean(), weights) * 252
+        # cov_matrix = log_return.cov() * 252
+        # expected_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+
+        expected_return = mcs_object._calculate_expected_return(weights, log_return)
+        expected_volatility = mcs_object._calculate_expected_volatility(weights, log_return)
+
+        constant_expected_return = -3.7537
+        constant_expected_volatility = 0.2705
+
+        tolerance = 0.0001
+
+        assert abs(expected_return - constant_expected_return) < tolerance, \
+        f"Expected return is incorrect: {expected_return:.4f} != {constant_expected_return:.4f}"
+        assert abs(expected_volatility - constant_expected_volatility) < tolerance, \
+        f"Expected volatility is incorrect: {expected_volatility:.4f} != {constant_expected_volatility:.4f}"
+        assert isinstance(expected_return, float), "Expected return should be a float"
+
+        assert isinstance(
+            expected_volatility, float
+        ), "Expected volatility should be a float"
+        assert expected_volatility >= 0, "Volatility should not be negative"
+        print(f"Expected Return: {expected_return:.4f}")
+        print(f"Expected Volatility: {expected_volatility:.4f}")

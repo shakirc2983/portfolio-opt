@@ -4,10 +4,12 @@ import numpy as np
 import pandas as pd
 from yfinance import shared
 from yfinance.exceptions import YFTickerMissingError
+from portfolio_opt import portfolio
 from portfolio_opt.portfolio import Portfolio
 from portfolio_opt.exceptions import TickerDateOutOfRange, TickerDownloadError
 import requests
 import random
+from matplotlib import pyplot as plt
 
 
 class MonteCarloSimulation:
@@ -18,6 +20,7 @@ class MonteCarloSimulation:
         self.start_date = start_date
         self.end_date = end_date
         self.portfolios = []
+        self.object_index = {}
         self.exit_flag = False
         self.annualized_day = 252
         self._initialize_object()
@@ -77,7 +80,9 @@ class MonteCarloSimulation:
 
         if self.exit_flag:
             return
+
         self._generate_portfolios()
+        self._setup_object_index()
 
     def _get_historical_returns(self):
         start_date = self.start_date
@@ -142,7 +147,11 @@ class MonteCarloSimulation:
                 expected_returns, expected_volatility
             )
             portfolio = Portfolio(
-                weights, len(self.tickers), expected_returns, expected_volatility
+                simulation_no,
+                weights,
+                len(self.tickers),
+                expected_returns,
+                expected_volatility,
             )
             portfolio.set_sharpe_ratio(sharpe_ratio)
             portfolio.set_simulation_no(simulation_no)
@@ -153,8 +162,17 @@ class MonteCarloSimulation:
         weights = weights / np.sum(weights)
         return weights
 
+    def _setup_object_index(self):
+        self.object_index = {
+            portfolio.id: index for index, portfolio in enumerate(self.portfolios)
+        }
+
     def get_portfolios(self):
         return self.portfolios
+
+    def get_portfolio(self, id):
+        index = self.object_index[id]
+        return self.portfolios[index]
 
     def get_random_portfolio(self):
         return random.choice(self.portfolios)
@@ -208,3 +226,13 @@ class MonteCarloSimulation:
         Sharpe Ratio (Max): {self.max_sharpe_value()}
         Sharpe Ratio (Min): {self.min_sharpe_value()}
         """
+
+    def plot_allocations(self, portfolio):
+        tickers = self.tickers
+        weights = portfolio.weights
+        sizes = np.multiply(weights, 10)
+
+        figures, axis = plt.subplots()
+        graph = axis.pie(sizes, labels=tickers, autopct="%1.1f%%")
+        plt.show()
+        return graph

@@ -1,10 +1,11 @@
 [project]
 name = "portfolio_opt"
 version = "0.1"
-dependencies = ["pandas", "yfinance","numpy"]
+dependencies = ["pandas", "yfinance","numpy","matplotlib"]
 
 [project.optional-dependencies]
 dev = [
     "black",
-    "pylint"
+    "pylint",
+    "PyQt6"
 ]
