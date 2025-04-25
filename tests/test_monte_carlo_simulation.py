@@ -1,9 +1,10 @@
 import unittest
 import yfinance as yf
 from yfinance.exceptions import YFTickerMissingError
+import numpy as np
 from portfolio_opt.monte_carlo_simulation import MonteCarloSimulation
 from portfolio_opt.exceptions import TickerDateOutOfRange
-import numpy as np
+
 
 
 class TestMCS(unittest.TestCase):

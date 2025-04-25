@@ -13,8 +13,9 @@ from portfolio_opt.exceptions import TickerDateOutOfRange, TickerDownloadError
 
 
 class MonteCarloSimulation:
-
     # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-too-many-arguments
+    # pylint: disable=too-too-many-positional-arguments
     def __init__(self, simulations, tickers, start_date, end_date):
 
         self.id_ = id(self)
