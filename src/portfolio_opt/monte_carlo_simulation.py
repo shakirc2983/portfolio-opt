@@ -2,7 +2,7 @@ import datetime
 import yfinance as yf
 import numpy as np
 import pandas as pd
-from yfinance import shared
+from yfinance import shared, tickers
 from yfinance.exceptions import YFTickerMissingError
 from portfolio_opt import portfolio
 from portfolio_opt.portfolio import Portfolio
@@ -13,7 +13,10 @@ from matplotlib import pyplot as plt
 
 
 class MonteCarloSimulation:
+
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, simulations, tickers, start_date, end_date):
+
         self.id = id(self)
         self.simulations = simulations
         self.tickers = tickers
@@ -52,7 +55,8 @@ class MonteCarloSimulation:
             if self.start_date >= self.end_date:
                 self.exit_flag = True
                 raise TickerDateOutOfRange(
-                    tickers_error=f"Portfolio start date {self.start_date} greater than portfolio end date {self.end_date}"
+                    tickers_error=f"Portfolio start date {self.start_date} "
+                    f"greater than portfolio end date {self.end_date}"
                 )
         except ValueError:
             self.exit_flag = True
@@ -62,7 +66,7 @@ class MonteCarloSimulation:
         for ticker_text in tickers:
             ticker = yf.Ticker(ticker_text)
             try:
-                info = ticker.info["forwardPE"]
+                ticker.info["forwardPE"]
             except requests.exceptions.HTTPError as e:
                 print(f"HTTP error: {e.args[0]}")
                 self.exit_flag = True
@@ -99,15 +103,12 @@ class MonteCarloSimulation:
             if "Close" not in data.columns:
                 raise KeyError("'Close' column not found in the returned data.")
 
-            # pylint: disable:protected-access
             if shared._ERRORS:
                 tickers_error = list(shared._ERRORS.keys())
                 raise TickerDownloadError(
                     f"Can't download specific tickers {tickers_error}"
                 )
             return data["Close"]
-
-            # pylint: enable:protected-access
 
         except (ValueError, KeyError, TickerDownloadError) as e:
             print(f"[ERROR]: {e}")
@@ -181,9 +182,7 @@ class MonteCarloSimulation:
         return min(self.portfolios, key=lambda p: p.expected_volatility)
 
     def max_volatility(self):
-        return max(
-            self.portfolios, key=lambda p: p.expected_volatility
-        )
+        return max(self.portfolios, key=lambda p: p.expected_volatility)
 
     def max_sharpe(self):
         return max(self.portfolios, key=lambda p: p.sharpe_ratio)
@@ -235,20 +234,36 @@ class MonteCarloSimulation:
         figures, axis = plt.subplots()
         graph = axis.pie(sizes, labels=tickers, autopct="%1.1f%%")
         plt.show()
-        return graph 
+        return graph
+
     def plot_mcs(self):
-        plt.figure(figsize=(12,8))
-        vol_arr, ret_arr, sharpe_arr = zip(*[(p.expected_volatility, p.expected_returns, p.sharpe_ratio)
-            for p in self.portfolios
-        ])
+        plt.figure(figsize=(12, 8))
+        vol_arr, ret_arr, sharpe_arr = zip(
+            *[
+                (p.expected_volatility, p.expected_returns, p.sharpe_ratio)
+                for p in self.portfolios
+            ]
+        )
         plt.scatter(vol_arr, ret_arr, c=sharpe_arr)
-        plt.colorbar(label='Sharpe Ratio')
-        plt.xlabel('Volatility')
-        plt.ylabel('Return')
-        
+        plt.colorbar(label="Sharpe Ratio")
+        plt.xlabel("Volatility")
+        plt.ylabel("Return")
+
         max_sharpe_port = self.max_sharpe()
-        plt.scatter(max_sharpe_port.expected_volatility, max_sharpe_port.expected_returns, c='red', s=50, edgecolors='black')
+        plt.scatter(
+            max_sharpe_port.expected_volatility,
+            max_sharpe_port.expected_returns,
+            c="red",
+            s=50,
+            edgecolors="black",
+        )
 
         min_volatility_port = self.min_volatility()
-        plt.scatter(min_volatility_port.expected_volatility, min_volatility_port.expected_returns, c='lawngreen', s=50, edgecolors='black')
+        plt.scatter(
+            min_volatility_port.expected_volatility,
+            min_volatility_port.expected_returns,
+            c="lawngreen",
+            s=50,
+            edgecolors="black",
+        )
         plt.show()

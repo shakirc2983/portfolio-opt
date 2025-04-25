@@ -1,6 +1,3 @@
-from yfinance import tickers
-
-
 class TickerDownloadError(Exception):
     """Exception raised when there's an error downloading tickers."""
 

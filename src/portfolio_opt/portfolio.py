@@ -1,5 +1,5 @@
 class Portfolio:
-    def __init__(self, id ,weights, size, expected_returns, expected_volatility):
+    def __init__(self, id, weights, size, expected_returns, expected_volatility):
         self.id = id
         self.weights = weights
         self.size = size
