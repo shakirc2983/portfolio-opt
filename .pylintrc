@@ -5,4 +5,5 @@ disable=missing-module-docstring,
         missing-class-docstring,
         redefined-outer-name,
         too-few-public-methods,
-        too-many-instance-attributes
+        too-many-instance-attributes,
+        too-many-positional-arguments
