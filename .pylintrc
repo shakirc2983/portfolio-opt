@@ -1,4 +1,4 @@
-[MESSAGES CONTROL]
+[messages control]
 
 disable=missing-module-docstring,
         missing-function-docstring,

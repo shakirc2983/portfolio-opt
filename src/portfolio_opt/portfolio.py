@@ -1,6 +1,7 @@
 class Portfolio:
-    def __init__(self, id, weights, size, expected_returns, expected_volatility):
-        self.id = id
+    # pylint: disable=too-many-instance-attributes
+    def __init__(self, id_, weights, size, expected_returns, expected_volatility):
+        self.id = id_
         self.weights = weights
         self.size = size
         self.sharpe_ratio = None

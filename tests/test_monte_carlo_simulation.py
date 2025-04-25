@@ -61,7 +61,6 @@ class TestMCS(unittest.TestCase):
 
         close_data = data["Close"]
         mcs_object = MonteCarloSimulation(100, tickers, start_date, end_date)
-        portfolio = mcs_object.get_random_portfolio()
 
         log_return = np.log(close_data / close_data.shift(1)).dropna()
         weights = np.array([0.5, 0.5])
@@ -72,10 +71,13 @@ class TestMCS(unittest.TestCase):
         # cov_matrix = log_return.cov() * 252
         # expected_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
 
+        # pylint: disable=protected-access
         expected_return = mcs_object._calculate_expected_return(weights, log_return)
         expected_volatility = mcs_object._calculate_expected_volatility(
             weights, log_return
         )
+
+        # pylint: enable=protected-access
 
         constant_expected_return = -3.7537
         constant_expected_volatility = 0.2705
@@ -85,9 +87,10 @@ class TestMCS(unittest.TestCase):
         assert (
             abs(expected_return - constant_expected_return) < tolerance
         ), f"Expected return is incorrect: {expected_return:.4f} != {constant_expected_return:.4f}"
-        assert (
-            abs(expected_volatility - constant_expected_volatility) < tolerance
-        ), f"Expected volatility is incorrect: {expected_volatility:.4f} != {constant_expected_volatility:.4f}"
+        assert abs(expected_volatility - constant_expected_volatility) < tolerance, (
+            f"Expected volatility is incorrect: {expected_volatility:.4f} "
+            f"!= {constant_expected_volatility:.4f}"
+        )
         assert isinstance(expected_return, float), "Expected return should be a float"
 
         assert isinstance(

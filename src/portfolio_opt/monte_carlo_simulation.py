@@ -1,15 +1,15 @@
 import datetime
+import random
+import requests
 import yfinance as yf
 import numpy as np
 import pandas as pd
-from yfinance import shared, tickers
+from yfinance import shared
 from yfinance.exceptions import YFTickerMissingError
-from portfolio_opt import portfolio
+from matplotlib import pyplot as plt
+
 from portfolio_opt.portfolio import Portfolio
 from portfolio_opt.exceptions import TickerDateOutOfRange, TickerDownloadError
-import requests
-import random
-from matplotlib import pyplot as plt
 
 
 class MonteCarloSimulation:
@@ -17,7 +17,7 @@ class MonteCarloSimulation:
     # pylint: disable=too-many-instance-attributes
     def __init__(self, simulations, tickers, start_date, end_date):
 
-        self.id = id(self)
+        self.id_ = id(self)
         self.simulations = simulations
         self.tickers = tickers
         self.start_date = start_date
@@ -31,7 +31,7 @@ class MonteCarloSimulation:
     def __str__(self):
         return f"""
         --- Monte Carlo Simulation ---
-        Object ID: {self.id}
+        Object ID: {self.id_}
         Simulations: {self.simulations}
         Stocks: {self.tickers}
         Portfolio Size: {len(self.tickers)}
@@ -58,9 +58,9 @@ class MonteCarloSimulation:
                     tickers_error=f"Portfolio start date {self.start_date} "
                     f"greater than portfolio end date {self.end_date}"
                 )
-        except ValueError:
+        except ValueError as e:
             self.exit_flag = True
-            raise ValueError("Incorrect date format, should be YYYY-MM-DD")
+            raise ValueError("Incorrect date format, should be YYYY-MM-DD") from e
 
     def _validate_tickers(self, tickers):
         for ticker_text in tickers:
@@ -75,7 +75,7 @@ class MonteCarloSimulation:
                 self.exit_flag = True
                 raise YFTickerMissingError(
                     ticker=ticker_text, rationale="Couldn't find ticker in yfinance"
-                )
+                ) from e
 
     def _initialize_object(self):
         self._validate_tickers(self.tickers)
@@ -103,11 +103,13 @@ class MonteCarloSimulation:
             if "Close" not in data.columns:
                 raise KeyError("'Close' column not found in the returned data.")
 
+            # pylint: disable=protected-access
             if shared._ERRORS:
                 tickers_error = list(shared._ERRORS.keys())
                 raise TickerDownloadError(
                     f"Can't download specific tickers {tickers_error}"
                 )
+            # pylint: enable=protected-access
             return data["Close"]
 
         except (ValueError, KeyError, TickerDownloadError) as e:
@@ -171,8 +173,8 @@ class MonteCarloSimulation:
     def get_portfolios(self):
         return self.portfolios
 
-    def get_portfolio(self, id):
-        index = self.object_index[id]
+    def get_portfolio(self, id_):
+        index = self.object_index[id_]
         return self.portfolios[index]
 
     def get_random_portfolio(self):
@@ -231,7 +233,7 @@ class MonteCarloSimulation:
         weights = portfolio.weights
         sizes = np.multiply(weights, 10)
 
-        figures, axis = plt.subplots()
+        _, axis = plt.subplots()
         graph = axis.pie(sizes, labels=tickers, autopct="%1.1f%%")
         plt.show()
         return graph
