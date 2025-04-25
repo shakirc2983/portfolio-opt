@@ -1,7 +1,7 @@
 class Portfolio:
     # pylint: disable=too-many-instance-attributes
-    # pylint: disable=too-too-many-arguments
-    # pylint: disable=too-too-many-positional-arguments
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
     def __init__(self, id_, weights, size, expected_returns, expected_volatility):
         self.id = id_
         self.weights = weights
