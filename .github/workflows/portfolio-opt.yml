@@ -1,0 +1,29 @@
+name: Portfolio-Opt
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        . venv/bin/activate
+        pip install -U pip setuptools
+        pip install -e .  # Install the package in editable mode
+    - name: Running unit tests
+      run: |
+        . venv/bin/activate
+        python -m unittest discover
