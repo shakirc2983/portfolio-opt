@@ -3,7 +3,7 @@ name: Pylint
 on:
   push:
     branches:
-      - MCS_tests
+      - main
 
 jobs:
   build:
