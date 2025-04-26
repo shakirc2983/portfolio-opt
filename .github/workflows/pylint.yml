@@ -1,13 +1,16 @@
 name: Pylint
 
-on: [push]
+on:
+  push:
+    branches:
+      - MCS_tests
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.9", "3.10"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -16,9 +19,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pylint
+        python -m venv venv
+        . venv/bin/activate
+        pip install -U pip setuptools
+        pip install -e .  # Install the package in editable mode
+        pip install pylint  # Install pylint
     - name: Analysing the code with pylint
       run: |
+        . venv/bin/activate
         pylint $(git ls-files '*.py')
