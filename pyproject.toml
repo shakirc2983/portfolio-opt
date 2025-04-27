@@ -1,7 +1,7 @@
 [project]
 name = "portfolio_opt"
 version = "0.1"
-dependencies = ["pandas", "yfinance","numpy","matplotlib"]
+dependencies = ["pandas", "yfinance","numpy","matplotlib", "flask", "flask-cors"]
 
 [project.optional-dependencies]
 dev = [
