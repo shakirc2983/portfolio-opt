@@ -26,7 +26,6 @@ class MonteCarloSimulation:
         self.portfolios = []
         self.object_index = {}
         self.exit_flag = False
-        self.annualized_day = 252
         self._initialize_object()
 
     def __str__(self):
