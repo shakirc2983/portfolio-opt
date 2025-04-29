@@ -50,7 +50,8 @@ class MonteCarloSimulation:
             if past >= present:
                 self.exit_flag = True
                 raise TickerDateOutOfRange(
-                    tickers_error=f"Past: {past} greater than or equal to Present: {present} for {self.tickers}"
+                    tickers_error=f"Past: {past} greater than "
+                        f"or equal to Present: {present} for {self.tickers}"
                 )
             if self.start_date >= self.end_date:
                 self.exit_flag = True
