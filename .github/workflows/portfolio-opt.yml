@@ -3,7 +3,7 @@ name: Portfolio-Opt
 on:
   push:
     branches:
-      - main
+      - web
 
 jobs:
   build:
