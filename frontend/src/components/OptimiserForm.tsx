@@ -3,6 +3,8 @@ import Form from 'react-bootstrap/Form';
 
 import {useState} from 'react';
 
+import APIService from '../components/APIService.tsx';
+
 export default function OptimiserForm() {
   const [validated, setValidated] = useState(false);
 
@@ -13,6 +15,8 @@ export default function OptimiserForm() {
     endDate: false,
   });
 
+  const [data, setData] = useState([]);
+
   const formatDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -20,26 +24,36 @@ export default function OptimiserForm() {
     console.log(year + month + day)
     return `${year}-${month}-${day}`;
  };
+ const runMCS = (data) => {
+    APIService.RunMCS(data)
+    .then((response) => console.log('Success', response))
+    .catch(error => console.log('error',error))
+  }
+
+  const checkValid = (element) => {
+    return element == false;
+  }
 
  const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    console.log(e.currentTarget.elements);
-
-
     const updatedErrors = { ...errors };
-
     const elementArray = Array.from(e.currentTarget.elements);
-
+    const data = [];
 
     elementArray.map(function(element) {
       if (element instanceof HTMLInputElement) {
         updatedErrors[element.id] = element.value.trim() === '';
+        data.push(element.value);
       }
     });
 
     setErrors(updatedErrors);
 
+    if (Object.values(updatedErrors).every(checkValid)) {
+      setData(data);
+      runMCS(data);
+    }
   };
 
   return (
