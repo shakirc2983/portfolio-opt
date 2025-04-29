@@ -1,12 +1,13 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-import {useState} from 'react';
+import {useState, useRef} from 'react';
 
 import APIService from '../components/APIService.tsx';
 
 export default function OptimiserForm() {
   const [validated, setValidated] = useState(false);
+  const submitButtonRef = useRef(null);
 
   const [errors, setErrors] = useState({
     simulations: false,
@@ -25,9 +26,34 @@ export default function OptimiserForm() {
     return `${year}-${month}-${day}`;
  };
  const runMCS = (data) => {
+
+    const existingErrorBox = document.querySelector('.alert-danger');
+
+    if (submitButtonRef.current) {
+      submitButtonRef.current.disabled = true; // Disable button during submission
+    }
+
+    if (existingErrorBox) {
+      existingErrorBox.remove();
+    }
+
     APIService.RunMCS(data)
-    .then((response) => console.log('Success', response))
+    .then((response) => {
+      console.log(response)
+      if(response.error) {
+          const errorBox = document.createElement('div');
+          errorBox.className = 'alert alert-danger';
+          errorBox.setAttribute('role', 'alert');
+          errorBox.innerText = `Error: ${response.error}`;
+          document.body.appendChild(errorBox);      }
+    })
     .catch(error => console.log('error',error))
+    .finally(() => {
+        if (submitButtonRef.current) {
+          submitButtonRef.current.disabled = false;
+        }
+      });
+    
   }
 
   const checkValid = (element) => {
@@ -54,6 +80,8 @@ export default function OptimiserForm() {
       setData(data);
       runMCS(data);
     }
+
+
   };
 
   return (
@@ -78,7 +106,7 @@ export default function OptimiserForm() {
           <Form.Label>End Date</Form.Label>
           <Form.Control type="date" placeholder="DD/MM/YYYY" max={formatDate(new Date())} isInvalid={errors.endDate}></Form.Control>
         </Form.Group>
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" ref={submitButtonRef}>
           Submit
         </Button>
       </Form>
