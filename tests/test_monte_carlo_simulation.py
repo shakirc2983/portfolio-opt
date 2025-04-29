@@ -31,7 +31,7 @@ class TestMCS(unittest.TestCase):
         self.assertEqual(
             str(context.exception),
             f"Date given not valid: Portfolio start date {start_date} "
-            f"greater than portfolio end date {end_date}",
+            f"greater than or equal to portfolio end date {end_date}",
         )
 
     def test_validate_tickers(self):

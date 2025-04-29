@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from portfolio_opt import monte_carlo_simulation as MCS
+from portfolio_opt import monte_carlo_simulation
 app = Flask(__name__)
 
 CORS(app)
@@ -14,7 +14,12 @@ def mcs():
 @app.route("/run-mcs", methods=['POST'])
 def run_mcs():
     data = request.get_json()
-    print(data)
+    simulations, tickers, start_date, end_date = data
+    simulations = int(simulations)
+    tickers = [item.strip() for item in tickers.split(",")]
+    print(tickers)
+    mcs = monte_carlo_simulation.MonteCarloSimulation(simulations, tickers, start_date, end_date)
+    print(mcs)
     return jsonify('Done', 201)
     
 
