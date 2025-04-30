@@ -3,9 +3,9 @@ import Form from 'react-bootstrap/Form';
 
 import {useState, useRef} from 'react';
 
-import APIService from '../components/APIService.tsx';
+import APIService from '../components/APIService.jsx';
 
-export default function OptimiserForm() {
+export default function OptimiserForm({ onResult }) {
   const [validated, setValidated] = useState(false);
   const submitButtonRef = useRef(null);
 
@@ -30,7 +30,7 @@ export default function OptimiserForm() {
     const existingErrorBox = document.querySelector('.alert-danger');
 
     if (submitButtonRef.current) {
-      submitButtonRef.current.disabled = true; // Disable button during submission
+      submitButtonRef.current.disabled = true;
     }
 
     if (existingErrorBox) {
@@ -39,13 +39,16 @@ export default function OptimiserForm() {
 
     APIService.RunMCS(data)
     .then((response) => {
-      console.log(response)
+      //console.log(response)
       if(response.error) {
           const errorBox = document.createElement('div');
           errorBox.className = 'alert alert-danger';
           errorBox.setAttribute('role', 'alert');
           errorBox.innerText = `Error: ${response.error}`;
           document.body.appendChild(errorBox);      }
+      if (response.data) {
+          onResult(response.data);
+      }
     })
     .catch(error => console.log('error',error))
     .finally(() => {
@@ -53,7 +56,6 @@ export default function OptimiserForm() {
           submitButtonRef.current.disabled = false;
         }
       });
-    
   }
 
   const checkValid = (element) => {
