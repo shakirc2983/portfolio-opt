@@ -3,6 +3,7 @@ import './App.css'
 import OptimiserForm from './components/OptimiserForm.jsx'
 import FormResults from './components/FormResults.jsx'
 import EfficientFrontier from './components/EfficientFrontier.jsx'
+import PortfolioSelection from './components/PortfolioSelection.jsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
 export default function App() {
   const [result, setResult] = useState(null);
@@ -24,6 +25,7 @@ export default function App() {
         <OptimiserForm onResult={(data) => setResult(data)} />
         {result && <FormResults data={result} />}
         {result && <EfficientFrontier result={result}/>}
+        {result && <PortfolioSelection result={result}/>}
       </div>
 
     </>

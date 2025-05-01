@@ -19,11 +19,9 @@ export default function OptimiserForm({ onResult }) {
   const [data, setData] = useState([]);
 
   const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate() - 1);
-    console.log(year + month + day)
-    return `${year}-${month}-${day}`;
+    const yesterday = new Date(date)
+    yesterday.setDate(yesterday.getDate() - 1)
+    return yesterday.toISOString().split("T")[0];
  };
  const runMCS = (data) => {
 
@@ -91,7 +89,7 @@ export default function OptimiserForm({ onResult }) {
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="simulations">
           <Form.Label>Number of Simulations</Form.Label>
-          <Form.Control type="number" isInvalid={errors.simulations}></Form.Control>
+          <Form.Control type="number" isInvalid={errors.simulations} min="1"></Form.Control>
         </Form.Group>
         <Form.Group className="mb-3" controlId="tickers">
           <Form.Label>Stock Tickers</Form.Label>
