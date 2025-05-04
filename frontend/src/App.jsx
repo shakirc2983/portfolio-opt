@@ -4,9 +4,11 @@ import OptimiserForm from './components/OptimiserForm.jsx'
 import FormResults from './components/FormResults.jsx'
 import EfficientFrontier from './components/EfficientFrontier.jsx'
 import PortfolioSelection from './components/PortfolioSelection.jsx'
+import Allocation from './components/Allocation.jsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
 export default function App() {
   const [result, setResult] = useState(null);
+  const [portfolioData, setPortfolioData] = useState(null);
 
   // const [data, setData] = useState([{}])
  
@@ -25,7 +27,8 @@ export default function App() {
         <OptimiserForm onResult={(data) => setResult(data)} />
         {result && <FormResults data={result} />}
         {result && <EfficientFrontier result={result}/>}
-        {result && <PortfolioSelection result={result}/>}
+        {result && <PortfolioSelection result={result} onPortfolioData={(data) => setPortfolioData(data)}/>}
+        {portfolioData && <Allocation result={result} portfolioData={portfolioData}/>}
       </div>
 
     </>

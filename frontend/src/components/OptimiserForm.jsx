@@ -37,13 +37,13 @@ export default function OptimiserForm({ onResult }) {
 
     APIService.RunMCS(data)
     .then((response) => {
-      //console.log(response)
       if(response.error) {
           const errorBox = document.createElement('div');
           errorBox.className = 'alert alert-danger';
           errorBox.setAttribute('role', 'alert');
           errorBox.innerText = `Error: ${response.error}`;
-          document.body.appendChild(errorBox);      }
+          submitButtonRef.current.insertAdjacentElement('afterend', errorBox);
+      }
       if (response.data) {
           onResult(response.data);
       }
@@ -80,8 +80,6 @@ export default function OptimiserForm({ onResult }) {
       setData(data);
       runMCS(data);
     }
-
-
   };
 
   return (
@@ -93,13 +91,17 @@ export default function OptimiserForm({ onResult }) {
         </Form.Group>
         <Form.Group className="mb-3" controlId="tickers">
           <Form.Label>Stock Tickers</Form.Label>
-          <Form.Control type="text" placeholder="AAPL, MSFT, ..." isInvalid={errors.tickers}/>
           <Form.Text className="text-muted">
-          Please enter the correct stock ticker
+          <div>Please enter the correct stock ticker</div>
           </Form.Text>
+          <Form.Control type="text" placeholder="AAPL, MSFT, ..." isInvalid={errors.tickers}/>
+
         </Form.Group>
         <Form.Group className="mb-3" controlId="startDate">
           <Form.Label>Start Date</Form.Label>
+          <Form.Text className="text-muted">
+          <div>Gap between both dates must be 2 days or more</div>
+          </Form.Text>
           <Form.Control type="date" placeholder="DD/MM/YYYY" max={formatDate(new Date())} isInvalid={errors.startDate}></Form.Control>
         </Form.Group>
         <Form.Group className="mb-3" controlId="endDate">
@@ -107,7 +109,7 @@ export default function OptimiserForm({ onResult }) {
           <Form.Control type="date" placeholder="DD/MM/YYYY" max={formatDate(new Date())} isInvalid={errors.endDate}></Form.Control>
         </Form.Group>
         <Button variant="primary" type="submit" ref={submitButtonRef}>
-          Submit
+          Simulate
         </Button>
       </Form>
     </>

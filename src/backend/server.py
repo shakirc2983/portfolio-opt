@@ -7,6 +7,8 @@ app = Flask(__name__)
 
 CORS(app)
 
+simulation_result = None
+
 
 @app.route("/mcs", methods=["GET"])
 def mcs():
@@ -56,6 +58,31 @@ def ef():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/portfolio/<int:portfolio_id>")
+def portfolio(portfolio_id):
+    if "simulation_result" not in globals():
+        return jsonify({"error": "No simulation data available"}), 400
+
+    try:
+        portfolio = simulation_result.get_portfolio(portfolio_id)
+        if not portfolio or not hasattr(portfolio, 'weights'):
+            return jsonify({"error": "Invalid portfolio ID"}), 404
+
+        print("Has it gone through?")
+        return jsonify({
+            "tickers": getattr(simulation_result, 'tickers', []),
+            "weights": portfolio.weights.tolist(),
+            "returns": portfolio.expected_returns,
+            "volatility": portfolio.expected_volatility
+        }), 201
+
+    except ValueError:
+        print("ValueError")
+        return jsonify({"error": "Portfolio ID must be an integer"}), 400
+
+    except Exception as e:
+        print("Exception: ", e)
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

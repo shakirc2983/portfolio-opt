@@ -175,6 +175,7 @@ class MonteCarloSimulation:
         return self.portfolios
 
     def get_portfolio(self, id_):
+        print(self.object_index)
         index = self.object_index[id_]
         return self.portfolios[index]
 

@@ -8,6 +8,10 @@ function EfficientFrontier({ result }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const rangeFrom1ToMax = (max) => {
+    return Array.from({ length: max }, (_, i) => i + 1);
+  }
+
   useEffect(() => {
     if (!result) return;
 
@@ -46,6 +50,8 @@ function EfficientFrontier({ result }) {
           y: yData,
           mode: "markers",
           type: "scatter",
+          text: rangeFrom1ToMax(result.simulations).map(String),
+
           marker: {
             size:10,
             color:sharpeData,
