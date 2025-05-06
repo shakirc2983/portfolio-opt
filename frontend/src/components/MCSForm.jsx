@@ -5,7 +5,7 @@ import {useState, useRef} from 'react';
 
 import APIService from '../components/APIService.jsx';
 
-export default function OptimiserForm({ onResult }) {
+export default function MCSForm({ onResult }) {
   const [validated, setValidated] = useState(false);
   const submitButtonRef = useRef(null);
 
