@@ -6,6 +6,10 @@ Prerequisites:
 - Python version: 3.13.3 or newer
 - npm version: 9.2.0 or newer
 
+Important, Port Availability:
+- Frontend server (React): Port 5173
+- Backend server (Python): Port 5000
+
 Installation Steps
 
 1. Install Backend Dependencies
