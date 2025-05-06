@@ -1,4 +1,4 @@
-Portfolio Optimization
+ECS635U Final Year Project: Portfolio Optimization Web Tool
 
 This project implements Portfolio Optimization using the PyPortfolioOpt (Black-Litterman) model and Monte-Carlo Simulations. It leverages financial price data retrieved from yfinance. The app is structured with a backend (Python) and frontend (React).
 
