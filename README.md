@@ -42,7 +42,7 @@ Install frontend dependencies using npm:
 ```bash
 npm install
 ```
-7. Start Frontend Development Server
+4. Start Frontend Development Server
 
 Run the development server
 ```bash
