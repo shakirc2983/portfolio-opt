@@ -4,7 +4,7 @@ This project implements Portfolio Optimization using the PyPortfolioOpt (Black-L
 
 Prerequisites:
 - Python version: 3.13.3 or newer
-- npm version: 9.2.0 or newer
+- Node version: 9.2.0 or newer
 
 Important, Port Availability:
 - Frontend server (React): Port 5173
